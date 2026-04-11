@@ -14,7 +14,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -33,19 +33,14 @@ build/
 .vscode/
 
 # Java
-target/
 *.log
 
 # OS
 .DS_Store
 Thumbs.db
 
-# IDE
-.idea/
-.vscode/
-
 # Env
 .env
 
-# Uploads (IMPORTANT)
+# Uploads
 uploads/
