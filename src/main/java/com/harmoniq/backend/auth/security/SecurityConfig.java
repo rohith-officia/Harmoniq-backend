@@ -51,7 +51,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://your-frontend.vercel.app"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
@@ -69,7 +72,22 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/api/test", "/api/songs/stream/**").permitAll()
+
+                        // Public auth
+                        .requestMatchers("/api/auth/**", "/api/test").permitAll()
+
+                        // Public song/discovery endpoints
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/songs",
+                                "/api/songs/**",
+                                "/api/analytics/**",
+                                "/api/recommendations/**"
+                        ).permitAll()
+
+                        // Public stream endpoint
+                        .requestMatchers("/api/songs/stream/**").permitAll()
+
+                        // Everything else needs JWT
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
