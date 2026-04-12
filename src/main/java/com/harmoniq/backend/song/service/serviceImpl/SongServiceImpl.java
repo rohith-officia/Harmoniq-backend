@@ -168,10 +168,6 @@ public class SongServiceImpl implements SongService {
     public SongResponseDTO uploadSong(SongUploadRequestDTO request, MultipartFile audioFile) {
         User currentUser = getCurrentUser();
 
-        if (currentUser.getRole() != Role.ARTIST) {
-            throw new ForbiddenOperationException("Only ARTIST users can upload songs");
-        }
-
         ArtistProfile artistProfile = artistProfileRepository.findByUser(currentUser)
                 .orElseThrow(() -> new ResourceNotFoundException("Artist profile not found"));
 
@@ -181,16 +177,16 @@ public class SongServiceImpl implements SongService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .genre(request.getGenre())
-                .audioUrl(storedAudioPath)
                 .coverImageUrl(request.getCoverImageUrl())
                 .durationSeconds(request.getDurationSeconds())
+                .audioUrl(storedAudioPath)
+                .artistProfile(artistProfile)
                 .published(true)
                 .playCount(0L)
-                .artistProfile(artistProfile)
                 .build();
 
-        Song saved = songRepository.save(song);
-        return mapToResponse(saved);
+        Song savedSong = songRepository.save(song);
+        return mapToResponse(savedSong);
     }
 
     @Override

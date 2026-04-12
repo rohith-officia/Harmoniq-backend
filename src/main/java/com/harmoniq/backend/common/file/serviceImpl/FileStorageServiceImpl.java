@@ -1,7 +1,6 @@
 package com.harmoniq.backend.common.file.serviceImpl;
 
 import com.harmoniq.backend.common.file.FileStorageService;
-import com.harmoniq.backend.common.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,9 +40,9 @@ public class FileStorageServiceImpl implements FileStorageService {
             Path targetLocation = uploadPath.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            return targetLocation.toAbsolutePath().toString(); // important
+            return targetLocation.toAbsolutePath().toString();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store audio file");
+            throw new RuntimeException("Failed to store audio file: " + e.getMessage());
         }
     }
 }
