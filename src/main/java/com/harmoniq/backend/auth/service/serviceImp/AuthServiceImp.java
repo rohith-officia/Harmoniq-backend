@@ -5,13 +5,15 @@ import com.harmoniq.backend.auth.dto.LoginRequestDTO;
 import com.harmoniq.backend.auth.dto.RegisterRequestDTO;
 import com.harmoniq.backend.auth.security.JwtService;
 import com.harmoniq.backend.auth.service.AuthService;
-import com.harmoniq.backend.common.exception.ResourceNotFoundException;
+import com.harmoniq.backend.auth.service.serviceImp.UserCacheService;
 import com.harmoniq.backend.common.exception.UserAlreadyExistsException;
 import com.harmoniq.backend.user.entity.Role;
 import com.harmoniq.backend.user.entity.User;
 import com.harmoniq.backend.user.entity.UserStatus;
 import com.harmoniq.backend.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,9 +27,15 @@ public class AuthServiceImp implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserCacheService userCacheService;
 
+    // =========================
+    // REGISTER
+    // =========================
     @Override
+    @CacheEvict(value = "users", allEntries = true)
     public String register(RegisterRequestDTO request) {
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException("Email already exists");
         }
@@ -45,11 +53,16 @@ public class AuthServiceImp implements AuthService {
                 .build();
 
         userRepository.save(user);
+
         return "User registered successfully";
     }
 
+    // =========================
+    // LOGIN
+    // =========================
     @Override
     public AuthResponseDTO login(LoginRequestDTO request) {
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -57,8 +70,8 @@ public class AuthServiceImp implements AuthService {
                 )
         );
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        // ✅ CACHE HAPPENS HERE (IMPORTANT FIX)
+        User user = userCacheService.getUserByEmail(request.getEmail());
 
         String token = jwtService.generateToken(user.getEmail());
 
