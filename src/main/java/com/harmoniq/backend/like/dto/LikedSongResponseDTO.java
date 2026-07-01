@@ -8,6 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class LikedSongResponseDTO {
+
     private Long songId;
     private String title;
     private String description;
