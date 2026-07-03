@@ -20,6 +20,9 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: mypassword
 
+    volumes:
+      - ./uploads:/app/uploads      # <-- Add this
+
   postgres:
     image: postgres:17
     container_name: harmoniq-postgres
@@ -37,7 +40,6 @@ services:
 
   redis:
     image: redis:7
-
     container_name: harmoniq-redis
 
     command: redis-server --requirepass mypassword

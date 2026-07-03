@@ -14,9 +14,11 @@ import com.harmoniq.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ArtistServiceImpl implements ArtistService {
 
     private final ArtistProfileRepository artistProfileRepository;
@@ -24,6 +26,7 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public ArtistProfileResponseDTO createArtistProfile(ArtistProfileRequestDTO request) {
+
         User currentUser = getCurrentUser();
 
         if (currentUser.getRole() != Role.ARTIST) {
@@ -45,11 +48,14 @@ public class ArtistServiceImpl implements ArtistService {
                 .build();
 
         ArtistProfile saved = artistProfileRepository.save(artistProfile);
+
         return mapToResponse(saved);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ArtistProfileResponseDTO getMyArtistProfile() {
+
         User currentUser = getCurrentUser();
 
         ArtistProfile artistProfile = artistProfileRepository.findByUser(currentUser)
@@ -59,7 +65,9 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ArtistProfileResponseDTO getArtistById(Long artistId) {
+
         ArtistProfile artistProfile = artistProfileRepository.findById(artistId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artist profile not found"));
 
@@ -68,6 +76,7 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public ArtistProfileResponseDTO updateMyArtistProfile(ArtistProfileRequestDTO request) {
+
         User currentUser = getCurrentUser();
 
         ArtistProfile artistProfile = artistProfileRepository.findByUser(currentUser)
@@ -79,10 +88,12 @@ public class ArtistServiceImpl implements ArtistService {
         artistProfile.setBannerImageUrl(request.getBannerImageUrl());
 
         ArtistProfile updated = artistProfileRepository.save(artistProfile);
+
         return mapToResponse(updated);
     }
 
     private User getCurrentUser() {
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return userRepository.findByEmail(email)
@@ -90,6 +101,7 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     private ArtistProfileResponseDTO mapToResponse(ArtistProfile artistProfile) {
+
         return ArtistProfileResponseDTO.builder()
                 .id(artistProfile.getId())
                 .userId(artistProfile.getUser().getId())

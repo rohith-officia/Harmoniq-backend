@@ -10,6 +10,7 @@ import com.harmoniq.backend.song.entity.Song;
 import com.harmoniq.backend.song.repository.SongRepository;
 import com.harmoniq.backend.user.entity.User;
 import com.harmoniq.backend.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,7 @@ public class LikeServiceImpl implements LikeService {
     }
 
     @Override
+    @Transactional
     public List<LikedSongResponseDTO> getMyLikedSongs() {
         User currentUser = getCurrentUser();
 

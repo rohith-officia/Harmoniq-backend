@@ -11,6 +11,7 @@ import com.harmoniq.backend.song.dto.SongResponseDTO;
 import com.harmoniq.backend.song.entity.Song;
 import com.harmoniq.backend.song.repository.SongRepository;
 import com.harmoniq.backend.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final ListeningHistoryRepository listeningHistoryRepository;
 
     @Override
+    @Transactional
     public List<SongResponseDTO> getTrendingSongs(int limit) {
         int safeLimit = Math.min(Math.max(limit, 1), 20);
 

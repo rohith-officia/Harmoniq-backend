@@ -1,6 +1,7 @@
 package com.harmoniq.backend.like.repository;
 
 import com.harmoniq.backend.like.entity.LikedSong;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -8,9 +9,18 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LikedSongRepository extends JpaRepository<LikedSong, Long> {
+
     boolean existsByUserIdAndSongId(Long userId, Long songId);
+
     Optional<LikedSong> findByUserIdAndSongId(Long userId, Long songId);
+
+    @EntityGraph(attributePaths = {
+            "song",
+            "song.artistProfile",
+            "song.artistProfile.user"
+    })
     List<LikedSong> findByUserId(Long userId);
+
     void deleteBySongId(Long songId);
 
     @Query("""

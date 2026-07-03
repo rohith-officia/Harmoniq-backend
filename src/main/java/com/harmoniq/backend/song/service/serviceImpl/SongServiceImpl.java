@@ -172,6 +172,7 @@ public class SongServiceImpl implements SongService {
     // UPLOAD SONG
     // =========================
     @Override
+    @Transactional
     @CacheEvict(value = "songs", allEntries = true)
     public SongResponseDTO uploadSong(SongUploadRequestDTO request, MultipartFile audioFile) {
 
@@ -203,7 +204,8 @@ public class SongServiceImpl implements SongService {
     // SEARCH SONGS
     // =========================
     @Override
-    public Page<SongResponseDTO> searchSongs(String query, String genre, String sort, int page, int size) {
+    @Transactional
+     public Page<SongResponseDTO> searchSongs(String query, String genre, String sort, int page, int size) {
 
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), 50);
